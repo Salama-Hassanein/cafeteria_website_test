@@ -21,18 +21,27 @@ if (isset($_POST['submit_order'])) {
 
     // insert the order into the database
     $query = "INSERT INTO orders (user_id, room_no, total_price, order_date, order_status) 
-              VALUES ('{$_SESSION['user_id']}', '$room_no', '$total_price', NOW(), 'processing')";
-    $result = mysqli_query($db, $query);
+              VALUES (:user_id, :room_no, :total_price, NOW(), 'processing')";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
+    $stmt->bindParam(':room_no', $room_no);
+    $stmt->bindParam(':total_price', $total_price);
+    $stmt->execute();
 
     // get the ID of the newly inserted order
-    $order_id = mysqli_insert_id($db);
+    $order_id = $pdo->lastInsertId();
 
     // insert the selected items into the order_items table
     foreach ($items as $item_id => $count) {
         if ($count > 0) {
             $query = "INSERT INTO order_items (order_id, product_id, quantity, notes) 
-                      VALUES ('$order_id', '$item_id', '$count', '{$notes[$item_id]}')";
-            mysqli_query($db, $query);
+                      VALUES (:order_id, :product_id, :quantity, :notes)";
+            $stmt = $pdo->prepare($query);
+            $stmt->bindParam(':order_id', $order_id);
+            $stmt->bindParam(':product_id', $item_id);
+            $stmt->bindParam(':quantity', $count);
+            $stmt->bindParam(':notes', $notes[$item_id]);
+            $stmt->execute();
         }
     }
 

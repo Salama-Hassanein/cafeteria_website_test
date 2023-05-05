@@ -1,29 +1,29 @@
 <?php
-session_start();
+// session_start();
 require_once 'includes/header.php';
 require_once 'includes/functions.php';
 
 // Redirect to index page if user is already logged in
 if (!empty($_SESSION['user_id'])) {
-  header('Location: index.php');
-  exit();
+    header('Location: index.php');
+    exit();
 }
 
 // Handle login form submission
 if (!empty($_POST)) {
-  $email = $_POST['email'];
-  $password = $_POST['password'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-  $user = get_user_by_email($email);
-  if ($user && password_verify($password, $user['password'])) {
-    // Login successful, store user ID in session and redirect to index page
-    $_SESSION['user_id'] = $user['id'];
-    header('Location: index.php');
-    exit();
-  } else {
-    // Login failed, show error message
-    $error = 'Invalid email or password';
-  }
+    $user = get_user_by_email($email);
+    if ($user && password_verify($password, $user['password'])) {
+        // Login successful, store user ID in session and redirect to index page
+        $_SESSION['user_id'] = $user['id'];
+        header('Location: index.php');
+        exit();
+    } else {
+        // Login failed, show error message
+        $error = 'Invalid email or password';
+    }
 }
 ?>
 

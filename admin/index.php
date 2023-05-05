@@ -1,6 +1,7 @@
 <?php
-// Include config file
-require_once '../includes/config.php';
+// include the database connection and helper functions
+require_once('../includes/config.php');
+require_once('../includes/functions.php');
 
 // Check if user is logged in as admin
 if (!is_admin()) {
@@ -9,26 +10,26 @@ if (!is_admin()) {
 
 // Get total number of products
 $query1 = "SELECT COUNT(*) as total_products FROM products";
-$result1 = mysqli_query($db, $query1);
-$row1 = mysqli_fetch_assoc($result1);
+$stmt1 = $pdo->query($query1);
+$row1 = $stmt1->fetch();
 $total_products = $row1['total_products'];
 
 // Get total number of categories
 $query2 = "SELECT COUNT(*) as total_categories FROM categories";
-$result2 = mysqli_query($db, $query2);
-$row2 = mysqli_fetch_assoc($result2);
+$stmt2 = $pdo->query($query2);
+$row2 = $stmt2->fetch();
 $total_categories = $row2['total_categories'];
 
 // Get total number of users
 $query3 = "SELECT COUNT(*) as total_users FROM users";
-$result3 = mysqli_query($db, $query3);
-$row3 = mysqli_fetch_assoc($result3);
+$stmt3 = $pdo->query($query3);
+$row3 = $stmt3->fetch();
 $total_users = $row3['total_users'];
 
 // Get total number of orders
 $query4 = "SELECT COUNT(*) as total_orders FROM orders";
-$result4 = mysqli_query($db, $query4);
-$row4 = mysqli_fetch_assoc($result4);
+$stmt4 = $pdo->query($query4);
+$row4 = $stmt4->fetch();
 $total_orders = $row4['total_orders'];
 
 // Display admin dashboard

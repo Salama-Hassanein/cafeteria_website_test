@@ -1,4 +1,4 @@
-<?php
+<?php 
 // Include config file
 require_once '../includes/config.php';
 
@@ -13,8 +13,9 @@ if (!is_admin()) {
 }
 
 // Get current orders
-$query = "SELECT * FROM orders WHERE status != 'completed' ORDER BY created_at DESC";
-$result = mysqli_query($db, $query);
+$sql = "SELECT * FROM orders WHERE status != 'completed' ORDER BY created_at DESC";
+$stmt = $pdo->query($sql);
+$orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Include header
 include_once('../includes/header.php');
@@ -35,11 +36,12 @@ include_once('../includes/header.php');
             </tr>
         </thead>
         <tbody>
-            <?php while ($order = mysqli_fetch_assoc($result)) { ?>
+            <?php foreach ($orders as $order) { ?>
             <?php $user_id = $order['user_id']; ?>
-            <?php $query2 = "SELECT * FROM users WHERE id = '$user_id'"; ?>
-            <?php $result2 = mysqli_query($db, $query2); ?>
-            <?php $user = mysqli_fetch_assoc($result2); ?>
+            <?php $sql2 = "SELECT * FROM users WHERE id = :id"; ?>
+            <?php $stmt2 = $pdo->prepare($sql2); ?>
+            <?php $stmt2->execute(['id' => $user_id]); ?>
+            <?php $user = $stmt2->fetch(PDO::FETCH_ASSOC); ?>
             <tr>
                 <td><?php echo $order['id']; ?></td>
                 <td><?php echo $user['name']; ?></td>

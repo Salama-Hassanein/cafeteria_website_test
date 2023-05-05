@@ -1,14 +1,20 @@
 <?php
-$host = "localhost";
-$user = "root";
-$password = "";
-$database = "cafeteria_db";
+$host = 'localhost';
+$username = 'root';
+$password = 'Salama@99';
+$dbname = 'cafeteria_db';
 
-// Create connection
-$conn = mysqli_connect($host, $user, $password, $database);
+try {
+    $pdo = new PDO("mysql:host=$host;", $username, $password);
 
-// Check connection
-if (!$conn) {
-  die("Connection failed: " . mysqli_connect_error());
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $sql = "CREATE DATABASE IF NOT EXISTS $dbname";
+    $pdo->exec($sql);
+
+    echo "Database created successfully";
+} catch(PDOException $e) {
+    echo "Error creating database: " . $e->getMessage();
 }
+
 ?>

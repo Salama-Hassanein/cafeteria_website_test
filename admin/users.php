@@ -1,14 +1,14 @@
 <?php
 require_once('../includes/config.php');
-require_once '../includes/functions.php';
+require_once('../includes/functions.php');
 check_admin();
 
 // Get all users
 $query = "SELECT * FROM users";
-$result = mysqli_query($db, $query);
-
-// Display users
+$stmt = $pdo->query($query);
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,6 +23,9 @@ $result = mysqli_query($db, $query);
 
     <main>
         <h1>Users</h1>
+        <?php if (count($users) == 0) { ?>
+        <p>There are no users.</p>
+        <?php } else { ?>
         <table>
             <tr>
                 <th>ID</th>
@@ -32,7 +35,7 @@ $result = mysqli_query($db, $query);
                 <th>Ext</th>
                 <th>Actions</th>
             </tr>
-            <?php while ($user = mysqli_fetch_assoc($result)) { ?>
+            <?php foreach ($users as $user) { ?>
             <tr>
                 <td><?php echo $user['id']; ?></td>
                 <td><?php echo $user['name']; ?></td>
@@ -47,6 +50,7 @@ $result = mysqli_query($db, $query);
             </tr>
             <?php } ?>
         </table>
+        <?php } ?>
         <a href="add_user.php">Add User</a>
     </main>
 

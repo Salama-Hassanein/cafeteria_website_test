@@ -7,10 +7,10 @@ check_session();
 
 // Get all products from the database
 $query = "SELECT * FROM products";
-$result = mysqli_query($db, $query);
+$stmt = $pdo->query($query);
 
 // Check if there are any products
-if (mysqli_num_rows($result) == 0) {
+if ($stmt->rowCount() == 0) {
   $message = "There are no products available.";
 } else {
   // Display the products in a table
@@ -26,7 +26,7 @@ if (mysqli_num_rows($result) == 0) {
                 </tr>
               </thead>
               <tbody>";
-  while ($product = mysqli_fetch_assoc($result)) {
+  while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $id = $product['id'];
     $name = $product['name'];
     $description = $product['description'];
@@ -34,9 +34,11 @@ if (mysqli_num_rows($result) == 0) {
     $category_id = $product['category_id'];
 
     // Get the category name
-    $query2 = "SELECT * FROM categories WHERE id = '$category_id'";
-    $result2 = mysqli_query($db, $query2);
-    $category = mysqli_fetch_assoc($result2);
+    $query2 = "SELECT * FROM categories WHERE id = :category_id";
+    $stmt2 = $pdo->prepare($query2);
+    $stmt2->bindParam(':category_id', $category_id);
+    $stmt2->execute();
+    $category = $stmt2->fetch(PDO::FETCH_ASSOC);
     $category_name = $category['name'];
 
     // Add the product to the table

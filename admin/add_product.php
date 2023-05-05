@@ -17,67 +17,74 @@ $categories = get_categories();
 // Check if the form was submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get the form data
-    $name = mysqli_real_escape_string($db, $_POST['name']);
-    $description = mysqli_real_escape_string($db, $_POST['description']);
+    $id = (int) $_POST['id'];
+    $name = $_POST['name'];
+    $description = $_POST['description'];
     $price = (float) $_POST['price'];
     $category_id = (int) $_POST['category_id'];
-    $image = $_FILES['image'];
 
     // Check if all fields are filled in
-    if (empty($name) || empty($description) || empty($price) || empty($category_id) || empty($image)) {
+    if (empty($name) || empty($description) || empty($price) || empty($category_id)) {
         $error_message = 'Please fill in all fields';
     } else {
-        // Upload the image to the server
-        $image_path = upload_image($image);
+        // Update the product in the database
+        $query = "UPDATE products SET name = :name, description = :description, price = :price, category_id = :category_id WHERE id = :id";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':description', $description);
+        $stmt->bindParam(':price', $price);
+        $stmt->bindParam(':category_id', $category_id);
+        $stmt->bindParam(':id', $id);
 
-        // Add the product to the database
-        $query = "INSERT INTO products (name, description, price, category_id, image) VALUES ('$name', '$description', $price, $category_id, '$image_path')";
-        $result = mysqli_query($db, $query);
-
-        if ($result) {
+        if ($stmt->execute()) {
             // Redirect to the products page
             header('Location: products.php');
             exit();
         } else {
-            $error_message = 'An error occurred while adding the product. Please try again later.';
+            $error_message = 'An error occurred while updating the product. Please try again later.';
         }
     }
 }
+
+// Get the product from the database
+$id = (int) $_GET['id'];
+$product = get_product($id);
 
 // Include the header
 include_once('../includes/header.php');
 ?>
 
-<h1>Add Product</h1>
+<h1>Edit Product</h1>
 
 <?php if (isset($error_message)): ?>
 <div class="alert alert-danger"><?php echo $error_message; ?></div>
 <?php endif; ?>
 
-<form method="POST" enctype="multipart/form-data">
+<form method="POST">
+    <input type="hidden" name="id" value="<?php echo $product['id']; ?>">
     <div class="form-group">
         <label for="name">Name:</label>
-        <input type="text" name="name" id="name" class="form-control">
+        <input type="text" name="name" id="name" class="form-control" value="<?php echo $product['name']; ?>">
     </div>
     <div class="form-group">
         <label for="description">Description:</label>
-        <textarea name="description" id="description" class="form-control"></textarea>
+        <textarea name="description" id="description"
+            class="form-control"><?php echo $product['description']; ?></textarea>
     </div>
     <div class="form-group">
         <label for="price">Price:</label>
-        <input type="number" step="0.01" name="price" id="price" class="form-control">
+        <input type="number" step="0.01" name="price" id="price" class="form-control"
+            value="<?php echo $product['price']; ?>">
     </div>
     <div class="form-group">
         <label for="category_id">Category:</label>
         <select name="category_id" id="category_id" class="form-control">
             <?php foreach ($categories as $category): ?>
-            <option value="<?php echo $category['id']; ?>"><?php echo $category['name']; ?></option>
+            <option value="<?php echo $category['id']; ?>"
+                <?php if ($category['id'] === $product['category_id']) echo 'selected'; ?>>
+                <?php echo $category['name']; ?></option>
             <?php endforeach; ?>
         </select>
-    </div>
-    <div class="form-group">
-        <label for="image">Image:</label>
-        <input type="file" name="image" id="image" class="form-control">
     </div>
     <button type="submit" class="btn btn-primary">Add Product</button>
 </form>

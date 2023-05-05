@@ -9,7 +9,7 @@ if (!is_admin()) {
 
 // Get all orders
 $query = "SELECT * FROM orders ORDER BY created_at DESC";
-$result = mysqli_query($db, $query);
+$stmt = $pdo->query($query);
 
 // Set page title
 $page_title = 'Orders';
@@ -35,29 +35,32 @@ include_once '../includes/header.php';
                 </thead>
                 <tbody>
                     <?php
-                    if (mysqli_num_rows($result) > 0) {
+                    if ($stmt->rowCount() > 0) {
                         $i = 1;
-                        while ($order = mysqli_fetch_assoc($result)) {
+                        while ($order = $stmt->fetch(PDO::FETCH_ASSOC)) {
                             $user_id = $order['user_id'];
-                            $query2 = "SELECT * FROM users WHERE id = '$user_id'";
-                            $result2 = mysqli_query($db, $query2);
-                            $user = mysqli_fetch_assoc($result2);
+                            $query2 = "SELECT * FROM users WHERE id = :user_id";
+                            $stmt2 = $pdo->prepare($query2);
+                            $stmt2->execute(['user_id' => $user_id]);
+                            $user = $stmt2->fetch(PDO::FETCH_ASSOC);
                             $user_name = $user['name'];
                             $user_email = $user['email'];
                             $user_room = $user['room'];
                             $user_ext = $user['ext'];
 
                             $order_id = $order['id'];
-                            $query3 = "SELECT * FROM order_items WHERE order_id = '$order_id'";
-                            $result3 = mysqli_query($db, $query3);
+                            $query3 = "SELECT * FROM order_items WHERE order_id = :order_id";
+                            $stmt3 = $pdo->prepare($query3);
+                            $stmt3->execute(['order_id' => $order_id]);
 
                             $order_total = 0;
                             $order_products = '';
-                            while ($item = mysqli_fetch_assoc($result3)) {
+                            while ($item = $stmt3->fetch(PDO::FETCH_ASSOC)) {
                                 $product_id = $item['product_id'];
-                                $query4 = "SELECT * FROM products WHERE id = '$product_id'";
-                                $result4 = mysqli_query($db, $query4);
-                                $product = mysqli_fetch_assoc($result4);
+                                $query4 = "SELECT * FROM products WHERE id = :product_id";
+                                $stmt4 = $pdo->prepare($query4);
+                                $stmt4->execute(['product_id' => $product_id]);
+                                $product = $stmt4->fetch(PDO::FETCH_ASSOC);
                                 $product_name = $product['name'];
                                 $product_price = $product['price'];
 

@@ -11,27 +11,31 @@
     }
 
     // Get check details
-    $query = "SELECT * FROM checks WHERE id = '$check_id'";
-    $result = mysqli_query($db, $query);
-    $check = mysqli_fetch_assoc($result);
+    $stmt = $pdo->prepare("SELECT * FROM checks WHERE id = :check_id");
+    $stmt->bindParam(':check_id', $check_id);
+    $stmt->execute();
+    $check = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Get user details
     $user_id = $check['user_id'];
-    $query2 = "SELECT * FROM users WHERE id = '$user_id'";
-    $result2 = mysqli_query($db, $query2);
-    $user = mysqli_fetch_assoc($result2);
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = :user_id");
+    $stmt->bindParam(':user_id', $user_id);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Get order details
     $order_id = $check['order_id'];
-    $query3 = "SELECT * FROM orders WHERE id = '$order_id'";
-    $result3 = mysqli_query($db, $query3);
-    $order = mysqli_fetch_assoc($result3);
+    $stmt = $pdo->prepare("SELECT * FROM orders WHERE id = :order_id");
+    $stmt->bindParam(':order_id', $order_id);
+    $stmt->execute();
+    $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Get product details
     $product_id = $order['product_id'];
-    $query4 = "SELECT * FROM products WHERE id = '$product_id'";
-    $result4 = mysqli_query($db, $query4);
-    $product = mysqli_fetch_assoc($result4);
+    $stmt = $pdo->prepare("SELECT * FROM products WHERE id = :product_id");
+    $stmt->bindParam(':product_id', $product_id);
+    $stmt->execute();
+    $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Display check details
 ?>

@@ -14,23 +14,23 @@ require_once '../includes/config.php';
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get data from form
-    $check_num = mysqli_real_escape_string($db, $_POST['check_num']);
-    $order_id = mysqli_real_escape_string($db, $_POST['order_id']);
-    $total = mysqli_real_escape_string($db, $_POST['total']);
+    $check_num = $_POST['check_num'];
+    $order_id = $_POST['order_id'];
+    $total = $_POST['total'];
     $date = date('Y-m-d H:i:s');
 
-    // Insert data into checks table
-    $query = "INSERT INTO checks (check_num, order_id, total, date) VALUES ('$check_num', '$order_id', '$total', '$date')";
-    mysqli_query($db, $query);
+    // Prepare and execute SQL statement to insert data into checks table
+    $stmt = $pdo->prepare("INSERT INTO checks (check_num, order_id, total, date) VALUES (:check_num, :order_id, :total, :date)");
+    $stmt->execute(['check_num' => $check_num, 'order_id' => $order_id, 'total' => $total, 'date' => $date]);
 
     // Redirect to current orders page
     header('Location: current_orders.php');
     exit;
 }
 
-// Get current orders from database
-$query = "SELECT * FROM orders WHERE status = 'pending'";
-$result = mysqli_query($db, $query);
+// Prepare and execute SQL statement to get current orders from database
+$stmt = $pdo->prepare("SELECT * FROM orders WHERE status = 'pending'");
+$stmt->execute();
 
 // Include header and navigation bar
 require_once 'header.php';
@@ -42,7 +42,7 @@ require_once 'header.php';
         <div class="form-group">
             <label for="order_id">Order ID:</label>
             <select class="form-control" name="order_id" required>
-                <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) { ?>
                 <option value="<?php echo $row['id']; ?>"><?php echo $row['id']; ?></option>
                 <?php } ?>
             </select>
